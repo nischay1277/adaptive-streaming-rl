@@ -174,4 +174,3 @@ python tools\validate_buffer_guard.py --media-dir results\demo\media\<video-id>
 ```
 
 The chosen rule estimates throughput as 0.6 times the minimum of the four recent observations and caps the action if estimated transfer time exceeds current buffer plus two seconds. Segment requests are served from localhost, not bandwidth-throttled. The uploaded trace drives simulator transfer/rebuffer estimates using actual encoded segment byte sizes. Playback is accelerated for presentation. The old `simulator_web\index.html` is the separate educational Q-table prototype and is not the trained PPO comparison.
-

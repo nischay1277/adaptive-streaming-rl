@@ -1,0 +1,47 @@
+{
+  "video_segments": 33,
+  "validation_trace_count": 12,
+  "paired_same_trace_sample_per_chunk": true,
+  "guard": {
+    "throughput_estimator": "0.6 * minimum of recent 4 throughput observations",
+    "download_deadline": "current buffer + 2 seconds",
+    "selected_validation_parameters": [
+      4,
+      0.6,
+      2.0
+    ]
+  },
+  "validation_mean": {
+    "rate_based": {
+      "qoe": 15.832755890231551,
+      "rebuffer_s": 3.108714505339034
+    },
+    "ppo_raw": {
+      "qoe": 22.257337349666013,
+      "rebuffer_s": 3.792811689794329
+    },
+    "ppo_safety_guard": {
+      "params": [
+        4,
+        0.6,
+        2.0
+      ],
+      "qoe": 27.570236345768834,
+      "rebuffer_s": 2.26020037830087
+    }
+  },
+  "stress_trace": {
+    "baseline": {
+      "qoe": -308.4121921196252,
+      "rebuffer_s": 74.12791577708514
+    },
+    "ppo": {
+      "qoe": -316.9147394406473,
+      "rebuffer_s": 75.88378701763735
+    },
+    "ppo_safety_guard": {
+      "qoe": -267.8252364183153,
+      "rebuffer_s": 63.93213860366429
+    }
+  }
+}

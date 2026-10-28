@@ -1,0 +1,193 @@
+{
+  "seed": 7,
+  "ppo_steps": 10000,
+  "training_trace_count": 47,
+  "validation_trace_count": 12,
+  "best_validation_reward": 50.675375602335784,
+  "best_validation_rebuffer": 5.287491731012731,
+  "best_action_counts": {
+    "300": 69,
+    "750": 76,
+    "1200": 120,
+    "1850": 156,
+    "2850": 77,
+    "4300": 90
+  },
+  "checkpoints": [
+    {
+      "step": 0,
+      "validation_reward": 48.83067504993798,
+      "validation_rebuffer": 5.263410655780537,
+      "action_counts": {
+        "300": 93,
+        "750": 52,
+        "1200": 117,
+        "1850": 159,
+        "2850": 77,
+        "4300": 90
+      },
+      "stage": "behavior_clone",
+      "saved": true
+    },
+    {
+      "step": 1024,
+      "loss": 833.1384887695312,
+      "validation_reward": 48.01644632340676,
+      "validation_rebuffer": 5.472620155584427,
+      "action_counts": {
+        "300": 93,
+        "750": 52,
+        "1200": 117,
+        "1850": 157,
+        "2850": 79,
+        "4300": 90
+      },
+      "stage": "ppo_finetune",
+      "saved": false
+    },
+    {
+      "step": 2048,
+      "loss": 1020.2156982421875,
+      "validation_reward": 49.00300972145519,
+      "validation_rebuffer": 5.263410655780537,
+      "action_counts": {
+        "300": 93,
+        "750": 52,
+        "1200": 117,
+        "1850": 159,
+        "2850": 77,
+        "4300": 90
+      },
+      "stage": "ppo_finetune",
+      "saved": true
+    },
+    {
+      "step": 3072,
+      "loss": 1332.293212890625,
+      "validation_reward": 50.675375602335784,
+      "validation_rebuffer": 5.287491731012731,
+      "action_counts": {
+        "300": 69,
+        "750": 76,
+        "1200": 120,
+        "1850": 156,
+        "2850": 77,
+        "4300": 90
+      },
+      "stage": "ppo_finetune",
+      "saved": true
+    },
+    {
+      "step": 4096,
+      "loss": 1352.5274658203125,
+      "validation_reward": 49.44639488292747,
+      "validation_rebuffer": 5.170347440824923,
+      "action_counts": {
+        "300": 93,
+        "750": 52,
+        "1200": 117,
+        "1850": 160,
+        "2850": 76,
+        "4300": 90
+      },
+      "stage": "ppo_finetune",
+      "saved": false
+    },
+    {
+      "step": 5120,
+      "loss": 1509.5552978515625,
+      "validation_reward": 50.4712257776582,
+      "validation_rebuffer": 5.209086195179108,
+      "action_counts": {
+        "300": 69,
+        "750": 74,
+        "1200": 119,
+        "1850": 159,
+        "2850": 77,
+        "4300": 90
+      },
+      "stage": "ppo_finetune",
+      "saved": false
+    },
+    {
+      "step": 6144,
+      "loss": 1053.3175048828125,
+      "validation_reward": 48.91296358995066,
+      "validation_rebuffer": 5.296864731442501,
+      "action_counts": {
+        "300": 93,
+        "750": 51,
+        "1200": 125,
+        "1850": 151,
+        "2850": 78,
+        "4300": 90
+      },
+      "stage": "ppo_finetune",
+      "saved": false
+    },
+    {
+      "step": 7168,
+      "loss": 833.388671875,
+      "validation_reward": 48.42647406015518,
+      "validation_rebuffer": 5.418295694982998,
+      "action_counts": {
+        "300": 93,
+        "750": 49,
+        "1200": 120,
+        "1850": 157,
+        "2850": 79,
+        "4300": 90
+      },
+      "stage": "ppo_finetune",
+      "saved": false
+    },
+    {
+      "step": 8192,
+      "loss": 160.5749053955078,
+      "validation_reward": 49.472676430282604,
+      "validation_rebuffer": 5.1123811057631325,
+      "action_counts": {
+        "300": 93,
+        "750": 51,
+        "1200": 126,
+        "1850": 151,
+        "2850": 75,
+        "4300": 92
+      },
+      "stage": "ppo_finetune",
+      "saved": false
+    },
+    {
+      "step": 9216,
+      "loss": 1458.2799072265625,
+      "validation_reward": 50.42114120650536,
+      "validation_rebuffer": 5.321590605567023,
+      "action_counts": {
+        "300": 69,
+        "750": 74,
+        "1200": 127,
+        "1850": 149,
+        "2850": 77,
+        "4300": 92
+      },
+      "stage": "ppo_finetune",
+      "saved": false
+    },
+    {
+      "step": 10000,
+      "loss": 1944.2962646484375,
+      "validation_reward": 48.38972649225321,
+      "validation_rebuffer": 5.404356063859114,
+      "action_counts": {
+        "300": 93,
+        "750": 49,
+        "1200": 127,
+        "1850": 150,
+        "2850": 77,
+        "4300": 92
+      },
+      "stage": "ppo_finetune",
+      "saved": false
+    }
+  ]
+}

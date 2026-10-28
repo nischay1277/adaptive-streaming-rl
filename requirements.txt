@@ -1,0 +1,8 @@
+numpy>=1.24
+pandas>=2.0
+matplotlib>=3.7
+torch>=2.0
+gymnasium>=0.29
+opencv-python>=4.8
+requests>=2.31
+imageio-ffmpeg==0.6.0
