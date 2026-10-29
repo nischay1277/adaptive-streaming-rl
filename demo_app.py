@@ -17,7 +17,8 @@ from urllib.parse import unquote, urlsplit
 import numpy as np
 
 from baselines import rate_based
-from env import ABREnv, BITRATES_KBPS, CHUNK_DURATION
+from env import (ABREnv, BITRATES_KBPS, CHUNK_DURATION,
+                 REBUFFER_PENALTY, SWITCH_PENALTY)
 from ppo_agent import PPOAgent
 
 
@@ -150,6 +151,12 @@ class Handler(SimpleHTTPRequestHandler):
                 "sha256": self.server.checkpoint_hash,
                 "action_rates_kbps": [int(x) for x in BITRATES_KBPS],
                 "chunk_duration_s": CHUNK_DURATION,
+                "reward": {"quality": "ln(current bitrate / 300 kbps)",
+                           "rebuffer_penalty_per_second": REBUFFER_PENALTY,
+                           "switch_penalty_per_log_bitrate_change": SWITCH_PENALTY},
+                "guard": {"window": self.server.guard_params[0],
+                          "margin": self.server.guard_params[1],
+                          "buffer_slack_s": self.server.guard_params[2]},
             })
             return
         if self.path == "/":
@@ -228,23 +235,32 @@ class Handler(SimpleHTTPRequestHandler):
                         shared_trace_index = env.chunk_idx % len(session["trace"])
                         env.trace_idx = shared_trace_index
                         obs = env._obs()
+                        buffer_before = float(env.buffer)
+                        chunk_index = int(env.chunk_idx)
                         if name == "baseline":
                             raw_action = action = rate_based(obs)
                             guard_applied = False
                             guard_throughput_kbps = None
                         else:
                             raw_action = self.server.agent.act(obs, deterministic=True)[0]
-                            # Validation-tuned shield: cap PPO to a rendition whose
-                            # estimated transfer fits in the current buffer + 2s.
+                            # Validation-tuned shield: parameters are selected on held-out
+                            # FCC traces and saved with the evaluation artifact.
                             recent_kbps = obs[2:6].astype(np.float64) * 6000.0
-                            guard_throughput_kbps = max(50.0, float(np.min(recent_kbps)) * 0.60)
-                            deadline_s = env.buffer + 2.0
+                            guard_window, guard_margin, guard_slack = self.server.guard_params
+                            guard_throughput_kbps = max(
+                                50.0, float(np.min(recent_kbps[-guard_window:])) * guard_margin)
+                            deadline_s = env.buffer + guard_slack
                             feasible = [i for i in range(raw_action + 1)
                                         if float(env.chunk_sizes[i, env.chunk_idx]) * 8.0 /
                                         (guard_throughput_kbps * 1000.0) <= deadline_s]
                             action = max(feasible) if feasible else 0
                             guard_applied = action < raw_action
+                        segment_size_bytes = float(env.chunk_sizes[action, chunk_index])
                         _, reward, done, _, info = env.step(action)
+                        bitrate_quality_reward = math.log(float(BITRATES_KBPS[action]) /
+                                                           float(BITRATES_KBPS[0]))
+                        rebuffer_penalty = REBUFFER_PENALTY * float(info["rebuffer"])
+                        switch_penalty = SWITCH_PENALTY * float(info["switch"])
                         previous = session["last_action"][name]
                         if previous is not None and previous != action:
                             session["switches"][name] += 1
@@ -252,6 +268,16 @@ class Handler(SimpleHTTPRequestHandler):
                         result[name] = {**info, "action": action, "raw_action": raw_action,
                                         "safety_guard_applied": guard_applied,
                                         "guard_throughput_kbps": guard_throughput_kbps,
+                                        "guard_deadline_s": (buffer_before + self.server.guard_params[2]
+                                                              if name == "ppo" else None),
+                                        "guard_params": (list(self.server.guard_params)
+                                                         if name == "ppo" else None),
+                                        "trace_sample_index": int(shared_trace_index),
+                                        "buffer_before": buffer_before,
+                                        "segment_size_bytes": segment_size_bytes,
+                                        "quality_reward": bitrate_quality_reward,
+                                        "rebuffer_penalty": rebuffer_penalty,
+                                        "switch_penalty": switch_penalty,
                                         "reward": float(reward),
                                         "switches": session["switches"][name],
                                         "reward_total": env.total_reward,
@@ -286,10 +312,21 @@ def main():
         checkpoint = ROOT / checkpoint
     if not checkpoint.is_file():
         raise SystemExit(f"PPO checkpoint missing: {checkpoint}. Run train_ppo.py first.")
+    guard_path = ROOT / "results" / "demo" / "safety_guard_evaluation.json"
+    try:
+        guard_data = json.loads(guard_path.read_text(encoding="utf-8"))
+        guard_params = tuple(guard_data["guard"]["selected_validation_parameters"])
+        if (len(guard_params) != 3 or int(guard_params[0]) not in (1, 2, 3, 4)
+                or float(guard_params[1]) <= 0 or float(guard_params[2]) < 0):
+            raise ValueError("invalid selected guard parameters")
+        guard_params = (int(guard_params[0]), float(guard_params[1]), float(guard_params[2]))
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"Could not load validated guard settings from {guard_path}: {exc}") from exc
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     server.agent = PPOAgent.load(checkpoint)
     server.checkpoint = checkpoint
     server.checkpoint_hash = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
+    server.guard_params = guard_params
     server.media = {}
     media_root = ROOT / "results" / "demo" / "media"
     if media_root.exists():
@@ -308,6 +345,8 @@ def main():
     print(f"ABR comparison demo: http://{args.host}:{args.port}")
     print(f"Loaded PPO checkpoint: {checkpoint}")
     print(f"Checkpoint SHA-256: {server.checkpoint_hash}")
+    print(f"Validated buffer guard: window={guard_params[0]}, margin={guard_params[1]:g}, "
+          f"buffer slack={guard_params[2]:g}s")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

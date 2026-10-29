@@ -36,6 +36,9 @@ except Exception:  # lets the smoke test run before dependencies are installed
 BITRATES_KBPS = np.array([300, 750, 1200, 1850, 2850, 4300], dtype=np.float32)
 CHUNK_DURATION = 4.0
 HISTORY = 4
+# Pensieve's logarithmic QoE variant (Mao et al., SIGCOMM 2017, Eq. 6/Table 1).
+REBUFFER_PENALTY = 2.66
+SWITCH_PENALTY = 1.0
 
 
 @dataclass
@@ -73,7 +76,7 @@ def _load_chunk_sizes(video_sizes_dir: Path) -> np.ndarray:
 
 
 class ABREnv(gym.Env):
-    """Headless adaptive bitrate streaming environment for PPO experiments."""
+    """adaptive bitrate streaming environment for PPO experiments."""
 
     metadata = {"render_modes": []}
 
@@ -131,7 +134,7 @@ class ABREnv(gym.Env):
 
         quality = float(np.log(BITRATES_KBPS[action] / BITRATES_KBPS[0]))
         switch = abs(float(np.log(BITRATES_KBPS[action] / BITRATES_KBPS[self.last_action])))
-        reward = quality - 4.3 * rebuffer - 1.10 * switch
+        reward = quality - REBUFFER_PENALTY * rebuffer - SWITCH_PENALTY * switch
 
         self.throughput_hist.pop(0)
         self.throughput_hist.append(throughput)

@@ -3,45 +3,45 @@
   "validation_trace_count": 12,
   "paired_same_trace_sample_per_chunk": true,
   "guard": {
-    "throughput_estimator": "0.6 * minimum of recent 4 throughput observations",
+    "throughput_estimator": "0.6 * minimum of the most recent 3 observations",
     "download_deadline": "current buffer + 2 seconds",
     "selected_validation_parameters": [
-      4,
+      3,
       0.6,
       2.0
     ]
   },
   "validation_mean": {
     "rate_based": {
-      "qoe": 15.832755890231551,
-      "rebuffer_s": 3.108714505339034
+      "qoe": 21.007719503949566,
+      "rebuffer_s": 3.1744176173230745
     },
     "ppo_raw": {
-      "qoe": 22.257337349666013,
-      "rebuffer_s": 3.792811689794329
+      "qoe": 28.53506760248817,
+      "rebuffer_s": 4.019304068206256
     },
     "ppo_safety_guard": {
       "params": [
-        4,
+        3,
         0.6,
         2.0
       ],
-      "qoe": 27.570236345768834,
-      "rebuffer_s": 2.26020037830087
+      "qoe": 31.228851550019424,
+      "rebuffer_s": 2.3538336416620975
     }
   },
   "stress_trace": {
     "baseline": {
-      "qoe": -308.4121921196252,
-      "rebuffer_s": 74.12791577708514
+      "qoe": -185.04966358079935,
+      "rebuffer_s": 73.69496235548114
     },
     "ppo": {
-      "qoe": -316.9147394406473,
-      "rebuffer_s": 75.88378701763735
+      "qoe": -189.5716743882285,
+      "rebuffer_s": 75.06950470049976
     },
     "ppo_safety_guard": {
-      "qoe": -267.8252364183153,
-      "rebuffer_s": 63.93213860366429
+      "qoe": -160.87803444134627,
+      "rebuffer_s": 63.41678849687044
     }
   }
 }

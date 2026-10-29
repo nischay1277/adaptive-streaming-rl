@@ -90,10 +90,12 @@ def main():
                                     tuple(best["params"]) if policy == "shield" else None)
                   for name, policy in (("baseline", "baseline"), ("ppo", "ppo"), ("ppo_safety_guard", "shield"))}
 
+    guard_window, guard_margin, guard_slack = best["params"]
     output = {"video_segments": chunks, "validation_trace_count": len(validation_traces),
               "paired_same_trace_sample_per_chunk": True,
-              "guard": {"throughput_estimator": "0.6 * minimum of recent 4 throughput observations",
-                        "download_deadline": "current buffer + 2 seconds",
+              "guard": {"throughput_estimator":
+                            f"{guard_margin:g} * minimum of the most recent {guard_window} observations",
+                        "download_deadline": f"current buffer + {guard_slack:g} seconds",
                         "selected_validation_parameters": best["params"]},
               "validation_mean": {"rate_based": baseline, "ppo_raw": ppo, "ppo_safety_guard": best},
               "stress_trace": stress}
