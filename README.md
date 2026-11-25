@@ -1,5 +1,9 @@
 # Adaptive Streaming with Reinforcement Learning
 
+**Stack:** Python, PyTorch, Gymnasium, FFmpeg, JavaScript.
+
+**Evaluation:** Compare a PPO bitrate policy with heuristic baselines on trace-driven playback. The repository includes the checkpoint, training and evaluation code, and test results for quality, rebuffering, and bitrate changes.
+
 A trace-driven adaptive-bitrate (ABR) streaming experiment with a PyTorch PPO policy, heuristic baselines, reproducible evaluation artifacts, and a local segmented-video comparison demo.
 
 At each video chunk, a policy chooses a bitrate while balancing visual quality, rebuffering, and bitrate changes. The project studies how the policy behaves across fixed-broadband training traces and mobile-network test traces.
